@@ -10,3 +10,7 @@ type Gakumon struct {
 	NumberOfCredits *int
 	Type            *string
 }
+
+type GakumonId struct {
+	GakumonId string `binding:"required"`
+}
