@@ -23,9 +23,12 @@ func TestGetGakumonIdList(t *testing.T) {
 	defer client.Close()
 
 	r := GakumonRepositoryImpl{
-		client: client,
-		ctx:    ctx,
+		Client: client,
+		Ctx:    ctx,
 	}
-	studentIdList := r.FetchAllGakumonId()
+	studentIdList, err := r.FetchAllGakumonId()
+	if err != nil {
+		t.Error(err.Error())
+	}
 	t.Log(studentIdList)
 }

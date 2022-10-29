@@ -28,28 +28,28 @@ func InitFirebase(path string) (*firestore.Client, context.Context, error) {
 }
 
 type GakumonRepositoryImpl struct {
-	client *firestore.Client
-	ctx    context.Context
+	Client *firestore.Client
+	Ctx    context.Context
 }
 
-func (r GakumonRepositoryImpl) FetchAllGakumonId() []model.GakumonId {
+func (r GakumonRepositoryImpl) FetchAllGakumonId() ([]model.GakumonId, error) {
 	var gakumon_id_list []model.GakumonId
-	iter := r.client.Collection("GAKUMON").Documents(r.ctx)
+	iter := r.Client.Collection("GAKUMON").Documents(r.Ctx)
 	for {
 		doc, err := iter.Next()
 		if err == iterator.Done {
 			break
 		}
 		if err != nil {
-			return []model.GakumonId{{GakumonId: err.Error()}}
+			return nil, err
 		}
 		var id model.GakumonId
 		if err := doc.DataTo(&id); err != nil {
-			return []model.GakumonId{{GakumonId: err.Error()}}
+			return nil, err
 		}
 		gakumon_id_list = append(gakumon_id_list, id)
 
 	}
-	return gakumon_id_list
+	return gakumon_id_list, nil
 
 }

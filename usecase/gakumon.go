@@ -5,11 +5,11 @@ import (
 )
 
 type GakumonUsecase interface {
-	GetGakumonList() []model.GakumonId
+	GetGakumonList() ([]model.GakumonId, error)
 }
 
 type GakumonRepository interface {
-	FetchAllGakumonId() []model.GakumonId
+	FetchAllGakumonId() ([]model.GakumonId, error)
 }
 
 type GakumonUsecaseImpl struct {
@@ -20,6 +20,6 @@ func NewGakumonUsecase(r GakumonRepository) *GakumonUsecaseImpl {
 	return &GakumonUsecaseImpl{r: r}
 }
 
-func (u GakumonUsecaseImpl) GetGakumonList() []model.GakumonId {
+func (u GakumonUsecaseImpl) GetGakumonList() ([]model.GakumonId, error) {
 	return u.r.FetchAllGakumonId()
 }
