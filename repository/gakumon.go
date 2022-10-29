@@ -32,8 +32,8 @@ type GakumonRepositoryImpl struct {
 	Ctx    context.Context
 }
 
-func (r GakumonRepositoryImpl) FetchAllGakumonId() ([]model.GakumonId, error) {
-	var gakumon_id_list []model.GakumonId
+func (r GakumonRepositoryImpl) FetchAllGakumonId() ([]model.GakumonID, error) {
+	var gakumon_id_list []model.GakumonID
 	iter := r.Client.Collection("GAKUMON").Documents(r.Ctx)
 	for {
 		doc, err := iter.Next()
@@ -43,7 +43,7 @@ func (r GakumonRepositoryImpl) FetchAllGakumonId() ([]model.GakumonId, error) {
 		if err != nil {
 			return nil, err
 		}
-		var id model.GakumonId
+		var id model.GakumonID
 		if err := doc.DataTo(&id); err != nil {
 			return nil, err
 		}
