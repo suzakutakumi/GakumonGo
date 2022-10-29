@@ -12,14 +12,14 @@ type GakumonRepository interface {
 	FetchAllGakumonId() ([]model.GakumonId, error)
 }
 
-type GakumonUsecaseImpl struct {
+type gakumonUsecaseImpl struct {
 	r GakumonRepository
 }
 
-func NewGakumonUsecase(r GakumonRepository) *GakumonUsecaseImpl {
-	return &GakumonUsecaseImpl{r: r}
+func NewGakumonUsecase(r GakumonRepository) *gakumonUsecaseImpl {
+	return &gakumonUsecaseImpl{r: r}
 }
 
-func (u GakumonUsecaseImpl) GetGakumonList() ([]model.GakumonId, error) {
+func (u gakumonUsecaseImpl) GetGakumonList() ([]model.GakumonId, error) {
 	return u.r.FetchAllGakumonId()
 }

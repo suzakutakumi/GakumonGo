@@ -12,15 +12,15 @@ type GakumonController interface {
 	GetGakumonList()
 }
 
-type GakumonControllerImp struct {
+type gakumonControllerImpl struct {
 	u usecase.GakumonUsecase
 }
 
-func NewGakumonController(u usecase.GakumonUsecase) *GakumonControllerImp {
-	return &GakumonControllerImp{u: u}
+func NewGakumonController(u usecase.GakumonUsecase) *gakumonControllerImpl {
+	return &gakumonControllerImpl{u: u}
 }
 
-func (c GakumonControllerImp) GetGakumonList(ctx *gin.Context) {
+func (c gakumonControllerImpl) GetGakumonList(ctx *gin.Context) {
 	l, err := c.u.GetGakumonList()
 	if err != nil {
 		log.Println(err.Error())
