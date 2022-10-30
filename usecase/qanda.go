@@ -49,7 +49,7 @@ func (u AnswerUsecaseImpl) CheckCollect(id string, ans model.Answer) (model.Gaku
 	if correctAnswer == ans {
 		gakumon, err := u.r.FindGakumon(id)
 		if err != nil {
-			return model.GakumonByAnswer{}, nil
+			return model.GakumonByAnswer{}, err
 		}
 		return model.GakumonByAnswer{
 			IsCollect: true,
