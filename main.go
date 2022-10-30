@@ -25,9 +25,23 @@ func main() {
 
 	r := repository.GakumonRepositoryImpl{Client: client, Ctx: ctx}
 	u := usecase.NewGakumonUsecase(r)
-	c := controller.NewGakumonController(u)
+	gakumonctrl := controller.NewGakumonController(u)
 
+	questionctrl := controller.NewQuestionControllerImpl(
+		usecase.NewQuestionUsecase(
+			repository.QuestionRepositoryImpl{Client: client, Ctx: ctx},
+		),
+	)
+
+	answerctrl := controller.NewAnswerControllerImpl(
+		usecase.NewAnswerUsecase(
+			repository.AnswerRepositoryImpl{Client: client, Ctx: ctx},
+		),
+	)
 	router := gin.Default()
-	router.GET("/gakumon_list", c.GetGakumonList)
+	router.GET("/gakumon_list", gakumonctrl.GetGakumonList)
+	router.GET("/gakumon/:gakumon_id/question", questionctrl.GetQuestion)
+	router.POST("/gakumon/:gakumon_id/answer", answerctrl.CheckCollect)
+
 	router.Run(":8080")
 }
