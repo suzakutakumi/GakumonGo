@@ -44,7 +44,7 @@ func (u QuestionUsecaseImpl) GetQuestion(id string) (model.Question, error) {
 func (u AnswerUsecaseImpl) CheckCollect(id string, ans model.Answer) (model.GakumonByAnswer, error) {
 	correctAnswer, err := u.r.FindAnswer(id)
 	if err != nil {
-		return model.GakumonByAnswer{}, nil
+		return model.GakumonByAnswer{}, err
 	}
 	if correctAnswer == ans {
 		gakumon, err := u.r.FindGakumon(id)
