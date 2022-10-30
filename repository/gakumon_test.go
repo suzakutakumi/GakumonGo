@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"context"
+	"log"
 	"os"
 	"testing"
 
@@ -15,18 +17,24 @@ func TestGetGakumonIdList(t *testing.T) {
 	}
 	keypath := "../" + os.Getenv("ACCOUNT_KEY_JSON_PATH")
 
-	client, ctx, err := InitFirebase(keypath)
+	ctx := context.Background()
+
+	app, err := InitFirebase(ctx, keypath)
 	if err != nil {
-		t.Error("firebaseの初期化ができませんでした")
-		return
+		log.Fatal(err.Error())
 	}
-	defer client.Close()
+
+	storeCli, err := InitFirestore(ctx, app)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	defer storeCli.Close()
 
 	r := GakumonRepositoryImpl{
-		Client: client,
-		Ctx:    ctx,
+		Firestore: storeCli,
+		Ctx:       ctx,
 	}
-	studentIdList, err := r.FetchAllGakumonId()
+	studentIdList, err := r.FetchAllGakumonID()
 	if err != nil {
 		t.Error(err.Error())
 	}

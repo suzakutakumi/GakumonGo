@@ -2,39 +2,25 @@ package repository
 
 import (
 	"context"
-	"errors"
+	"fmt"
 	"gakumon_go/model"
+	"io"
+	"mime/multipart"
 
 	"cloud.google.com/go/firestore"
-	firebase "firebase.google.com/go"
+	"firebase.google.com/go/storage"
 	"google.golang.org/api/iterator"
-	"google.golang.org/api/option"
 )
 
-func InitFirebase(path string) (*firestore.Client, context.Context, error) {
-	ctx := context.Background()
-	opt := option.WithCredentialsFile(path)
-	app, err := firebase.NewApp(ctx, nil, opt)
-	if err != nil {
-		return nil, nil, errors.New("firebaseの初期化に失敗しました")
-	}
-
-	client, err := app.Firestore(ctx)
-	if err != nil {
-		return nil, nil, errors.New("firestoreの初期化に失敗しました")
-	}
-
-	return client, ctx, nil
-}
-
 type GakumonRepositoryImpl struct {
-	Client *firestore.Client
-	Ctx    context.Context
+	Firestore *firestore.Client
+	Storage   *storage.Client
+	Ctx       context.Context
 }
 
-func (r GakumonRepositoryImpl) FetchAllGakumonId() ([]model.GakumonID, error) {
+func (r GakumonRepositoryImpl) FetchAllGakumonID() ([]model.GakumonID, error) {
 	var gakumon_id_list []model.GakumonID
-	iter := r.Client.Collection("GAKUMON").Documents(r.Ctx)
+	iter := r.Firestore.Collection("GAKUMON").Documents(r.Ctx)
 	for {
 		doc, err := iter.Next()
 		if err == iterator.Done {
@@ -50,6 +36,62 @@ func (r GakumonRepositoryImpl) FetchAllGakumonId() ([]model.GakumonID, error) {
 		gakumon_id_list = append(gakumon_id_list, id)
 
 	}
-	return gakumon_id_list, nil
 
+	return gakumon_id_list, nil
+}
+
+func (r GakumonRepositoryImpl) InsertGakumonInfo(g model.Gakumon) error {
+	_, err := r.Firestore.Collection("GAKUMON").Doc(g.GakumonID).Set(r.Ctx, g)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r GakumonRepositoryImpl) UploadGakumonImage(file multipart.File, fileName string) (string, error) {
+	bucket, err := r.Storage.Bucket("gakumongo-ae7fb.appspot.com")
+	if err != nil {
+		return "", err
+	}
+
+	o := bucket.Object(fileName)
+	w := o.NewWriter(r.Ctx)
+	if _, err = io.Copy(w, file); err != nil {
+		return "", err
+	}
+	if err = w.Close(); err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("https://firebasestorage.googleapis.com/v0/b/gakumongo-ae7fb.appspot.com/o/%s?alt=media", fileName), nil
+}
+
+func (r GakumonRepositoryImpl) DeleteGakumonImage(fileName string) error {
+	bucket, err := r.Storage.Bucket("gakumongo-ae7fb.appspot.com")
+	if err != nil {
+		return err
+	}
+
+	err = bucket.Object(fileName).Delete(r.Ctx)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r GakumonRepositoryImpl) InsertQandA(qanda model.QandA) error {
+	_, err := r.Firestore.Collection("QANDA").Doc(qanda.GakumonID).Set(r.Ctx, qanda)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r GakumonRepositoryImpl) DeleteQandA(id string) error {
+	_, err := r.Firestore.Collection("QANDA").Doc(id).Delete(r.Ctx)
+	if err != nil {
+		return err
+	}
+	return nil
 }
